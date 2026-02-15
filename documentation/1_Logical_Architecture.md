@@ -1,372 +1,151 @@
-# LOGICAL ARCHITECTURE DOCUMENT
-## E-Commerce Application
 
-**Course:** Full Stack Application Development  
-**Assignment:** App Design - E-Commerce App  
-**Date:** February 7, 2026
-
----
-
-## Table of Contents
-1. [Introduction](#1-introduction)
-2. [Architectural Pattern](#2-architectural-pattern)
-3. [System Layers](#3-system-layers)
-4. [Component Organization](#4-component-organization)
-5. [Package Diagram](#5-package-diagram)
-6. [Layer Interactions](#6-layer-interactions)
-7. [Design Principles](#7-design-principles)
+# Logical Architecture  
+## Full Stack E-Commerce Application
 
 ---
 
 ## 1. Introduction
 
-This document describes the logical architecture of the E-Commerce Application built using Angular framework. The architecture follows a layered approach with clear separation of concerns, ensuring maintainability, scalability, and testability.
+This document describes the **Logical Architecture** of e-commerce application.  
+The architecture is derived **directly from the implemented source code** of the project and reflects the actual structure of the frontend and backend components.
 
-### 1.1 Purpose
-The purpose of this document is to:
-- Define the large-scale organization of software components
-- Identify subsystems and layers
-- Describe responsibilities of each layer
-- Document interactions between components
+The system follows a **3-Tier Architecture**, consisting of:
+1. Presentation Layer
+2. Web API Layer
+3. Database Layer
 
-### 1.2 Scope
-This architecture document covers the client-side Angular application structure, including presentation, business logic, and data management layers.
+This design ensures separation between user interface, application logic, and data persistence while remaining simple and suitable for full-stack development.
 
 ---
 
-## 2. Architectural Pattern
+## 2. Architectural Style
 
-The application follows a **Layered Architecture Pattern** with the following characteristics:
+**Architecture Pattern Used:**  
+**Three-Tier Client–Server Architecture**
 
-- **Three-Tier Architecture**: Presentation, Business Logic, and Data layers
-- **Component-Based Architecture**: Modular, reusable Angular components
-- **Service-Oriented Design**: Separation of business logic into services
-- **Reactive Programming**: Observable-based state management using RxJS
+- Frontend: Angular SPA
+- Backend: ASP.NET Core Web API
+- Database: SQL Server (via Entity Framework Core)
 
----
-
-## 3. System Layers
-
-### 3.1 Presentation Layer (UI Layer)
-
-**Responsibility**: Handle user interactions and display data
-
-**Components**:
-- **RegisterComponent**: User registration interface
-- **LoginComponent**: User authentication interface
-- **DashboardComponent**: Product catalog with search and filtering
-- **ProductDetailComponent**: Detailed product information view
-- **PaymentComponent**: Checkout and payment processing
-- **OrdersComponent**: Order history and details
-
-**Characteristics**:
-- Standalone Angular components
-- Template-driven and reactive forms
-- Responsive design using CSS
-- User input validation
-- Navigation routing
-
-**Technologies**:
-- Angular 17+ (Standalone Components)
-- TypeScript
-- HTML5
-- CSS3
-- Angular Forms Module
-- Angular Router
+The backend combines application logic and data access in the controller layer, as observed in the implementation.
 
 ---
 
-### 3.2 Business Logic Layer (Service Layer)
+## 3. Layered Architecture Description
+<img width="744" height="588" alt="LayeredArchitecture" src="https://github.com/user-attachments/assets/af899633-5105-42ad-ab06-7298a45e07dd" />
 
-**Responsibility**: Implement core business functionality and application logic
+### 3.1 Presentation Layer (Frontend)
 
-**Services**:
+**Technology:**  
+- Angular (TypeScript, HTML, CSS)
 
-#### 3.2.1 AuthService
-- User registration and validation
-- User authentication (login/logout)
-- Session management
-- User data retrieval
-- Demo user initialization
+**Location in Codebase:**  
 
-#### 3.2.2 ProductService
-- Product catalog management
-- Product search functionality
-- Category filtering
-- Product details retrieval
-- Observable-based product stream
+**Key Components:**
+- LoginComponent
+- RegisterComponent
+- DashboardComponent (Product Listing + Search)
+- ProductDetailComponent
+- CartComponent
+- OrdersComponent
+- PaymentComponent (Dummy Payment)
 
-#### 3.2.3 CartService
-- Shopping cart management
-- Add/remove items from cart
-- Quantity updates
-- Cart total calculation
-- Persistent cart storage
+**Responsibilities:**
+- Rendering UI screens
+- Handling user interactions
+- Client-side validation
+- Navigation and routing
+- Invoking backend REST APIs using Angular services
 
-#### 3.2.4 OrderService
-- Order creation and processing
-- Order history retrieval
-- Order status management
-- Order details retrieval
+**Interaction Pattern:**
 
-**Characteristics**:
-- Injectable services with `@Injectable` decorator
-- Singleton pattern (providedIn: 'root')
-- Separation from UI components
-- Reusable across multiple components
-- Observable pattern for reactive data flow
+Frontend components do not directly access the database.
 
 ---
 
-### 3.3 Data Layer (Data Access Layer)
+### 3.2 Web API Layer (Backend)
+<img width="859" height="378" alt="BackendStructure" src="https://github.com/user-attachments/assets/7d041556-8f99-4c98-b0d4-90cc529b6867" />
 
-**Responsibility**: Handle data persistence and retrieval
+**Technology:**
+- ASP.NET Core Web API
+- Entity Framework Core
 
-**Implementation**:
-- Browser LocalStorage API for data persistence
-- JSON serialization/deserialization
-- Data models and interfaces
+**Location in Codebase:**
 
-**Data Stores**:
-- `users`: User account information
-- `currentUser`: Active session data
-- `shopping_cart`: Cart items
-- `orders`: Order history
+**Controllers:**
+- AuthController
+- ProductsController
+- CartController
+- OrdersController
 
-**Characteristics**:
-- Client-side data storage
-- No external database required
-- Data persists across browser sessions
-- Encapsulated within services
+**Responsibilities:**
+- Handling HTTP requests from frontend
+- Performing business logic
+- Managing authentication and authorization
+- Processing orders and cart operations
+- Interacting with the database using EF Core
 
----
+**Important Architectural Note:**
+There is **no separate repository or service layer**.  
+Controllers directly use `AppDbContext` for database operations.
 
-### 3.4 Cross-Cutting Concerns
-
-#### 3.4.1 Guards
-- **AuthGuard**: Route protection for authenticated pages
-- Implements CanActivateFn interface
-- Redirects unauthenticated users to login
-
-#### 3.4.2 Models/Interfaces
-- **User Model**: User account structure
-- **Product Model**: Product information structure
-- **Order Model**: Order and payment information
-- **CartItem Model**: Shopping cart item structure
-
-#### 3.4.3 Routing
-- Angular Router configuration
-- Lazy loading support
-- Route guards integration
-- Navigation flow management
+This makes the backend a **combined Application + Data Access layer**.
 
 ---
 
-## 4. Component Organization
+### 3.3 Data Access & Persistence Layer
 
-### 4.1 Directory Structure
+**Technology:**
+- SQL Server
+- Entity Framework Core (ORM)
 
-```
-src/app/
-├── components/           # Presentation Layer
-│   ├── register/
-│   ├── login/
-│   ├── dashboard/
-│   ├── product-detail/
-│   ├── payment/
-│   └── orders/
-├── services/            # Business Logic Layer
-│   ├── auth.service.ts
-│   ├── product.service.ts
-│   ├── cart.service.ts
-│   └── order.service.ts
-├── models/              # Data Models
-│   ├── user.model.ts
-│   ├── product.model.ts
-│   └── order.model.ts
-├── guards/              # Route Guards
-│   └── auth.guard.ts
-├── app.component.ts     # Root Component
-├── app.routes.ts        # Route Configuration
-└── app.config.ts        # App Configuration
-```
+**Key Files:**
 
-### 4.2 Component Hierarchy
+**Responsibilities:**
+- Object–relational mapping
+- Managing entity relationships
+- CRUD operations
+- Maintaining referential integrity
 
-```
-AppComponent (Root)
-├── RouterOutlet
-│   ├── LoginComponent
-│   ├── RegisterComponent
-│   ├── DashboardComponent (Auth Protected)
-│   ├── ProductDetailComponent (Auth Protected)
-│   ├── PaymentComponent (Auth Protected)
-│   └── OrdersComponent (Auth Protected)
-```
+Entities are mapped using EF Core models.
 
 ---
 
-## 5. Package Diagram
+## 4. Logical Layer Interaction
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                        │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  UI Components (Standalone Angular Components)      │  │
-│  │  • RegisterComponent  • LoginComponent              │  │
-│  │  • DashboardComponent • ProductDetailComponent      │  │
-│  │  • PaymentComponent   • OrdersComponent             │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                            ↓ ↑
-                    (Uses Services)
-                            ↓ ↑
-┌─────────────────────────────────────────────────────────────┐
-│                  BUSINESS LOGIC LAYER                        │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Services (Injectable Services)                      │  │
-│  │  • AuthService      • ProductService                 │  │
-│  │  • CartService      • OrderService                   │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                            ↓ ↑
-                    (Uses Models & Data)
-                            ↓ ↑
-┌─────────────────────────────────────────────────────────────┐
-│                      DATA LAYER                              │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Data Models & Storage                               │  │
-│  │  • User Model       • Product Model                  │  │
-│  │  • Order Model      • LocalStorage                   │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+### Example: Order Placement Flow
 
-┌─────────────────────────────────────────────────────────────┐
-│               CROSS-CUTTING CONCERNS                         │
-│  • AuthGuard (Route Protection)                             │
-│  • Router (Navigation)                                       │
-│  • RxJS (Reactive Programming)                              │
-└─────────────────────────────────────────────────────────────┘
-```
+1. User adds product to cart via Angular UI
+2. CartComponent calls CartService
+3. CartService sends HTTP request to CartController
+4. CartController processes logic and updates database using AppDbContext
+5. Order is created via OrdersController
+6. Data is persisted in SQL Server
+7. OrdersComponent fetches order history
 
 ---
 
-## 6. Layer Interactions
+## 5. Logical Architecture Diagram
+<img width="308" height="633" alt="LA" src="https://github.com/user-attachments/assets/14c91107-a738-4f56-94f8-2f4d1dd6cdfd" />
 
-### 6.1 User Authentication Flow
-
-```
-User Input (Login Form)
-        ↓
-LoginComponent (Presentation)
-        ↓
-AuthService.login() (Business Logic)
-        ↓
-LocalStorage.getItem('users') (Data)
-        ↓
-Validate Credentials
-        ↓
-LocalStorage.setItem('currentUser') (Data)
-        ↓
-Router.navigate('/dashboard') (Navigation)
-```
-
-### 6.2 Product Browsing Flow
-
-```
-User Opens Dashboard
-        ↓
-DashboardComponent (Presentation)
-        ↓
-ProductService.getProducts() (Business Logic)
-        ↓
-Observable<Product[]> (Reactive Data)
-        ↓
-Display Products in Grid
-        ↓
-User Searches/Filters
-        ↓
-ProductService.searchProducts() (Business Logic)
-        ↓
-Update Filtered Results
-```
-
-### 6.3 Order Placement Flow
-
-```
-User Initiates Checkout
-        ↓
-PaymentComponent (Presentation)
-        ↓
-CartService.getCart() (Business Logic)
-        ↓
-Display Cart Items
-        ↓
-User Enters Payment Info
-        ↓
-OrderService.createOrder() (Business Logic)
-        ↓
-LocalStorage.setItem('orders') (Data)
-        ↓
-CartService.clearCart() (Business Logic)
-        ↓
-Router.navigate('/orders') (Navigation)
-```
 
 ---
 
-## 7. Design Principles
+## 6. Separation of Concerns
 
-### 7.1 Separation of Concerns (SoC)
-- **UI Logic**: Isolated in component classes
-- **Business Logic**: Centralized in services
-- **Data Access**: Encapsulated within services
-- **Styling**: Separated in component CSS files
+| Concern | Implementation |
+|-------|----------------|
+| UI Rendering | Angular Components |
+| API Communication | Angular Services |
+| Business Logic | Backend Controllers |
+| Data Access | EF Core DbContext |
+| Persistence | SQL Server |
 
-### 7.2 Single Responsibility Principle (SRP)
-- Each component has one primary responsibility
-- Each service manages a specific domain
-- Models define data structure only
-
-### 7.3 Dependency Injection
-- Services injected into components
-- Promotes loose coupling
-- Enables testability and mocking
-
-### 7.4 Reactive Programming
-- Observable streams for data flow
-- Asynchronous data handling
-- Automatic UI updates on data changes
-
-### 7.5 Modularity
-- Standalone components
-- Reusable services
-- Clear interfaces between layers
-
-### 7.6 Encapsulation
-- Private methods in services
-- Public API for components
-- Data hiding in services
-
-### 7.7 DRY (Don't Repeat Yourself)
-- Shared services across components
-- Reusable models and interfaces
-- Common styling patterns
+Although backend logic and data access are combined, frontend and backend responsibilities are clearly separated.
 
 ---
 
-## 8. Conclusion
+## 7. Conclusion
 
-This logical architecture provides a solid foundation for the E-Commerce Application with:
-- **Clear layer separation** ensuring maintainability
-- **Service-based business logic** promoting reusability
-- **Component-based UI** enabling modularity
-- **Reactive data flow** providing responsiveness
-- **Client-side persistence** simplifying deployment
+The logical architecture of *The Contributor Hub* is a clean and functional **3-Tier full-stack architecture**.  
 
-The architecture follows Angular best practices and industry-standard design patterns, making the application scalable, testable, and easy to maintain.
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: February 7, 2026
